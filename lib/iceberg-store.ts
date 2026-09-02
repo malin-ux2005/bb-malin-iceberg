@@ -47,11 +47,11 @@ export type MediaRow = {
 let schemaPromise: Promise<void> | null = null;
 
 export function getBindings() {
-  if (!env.DB || !env.FILES) {
+  if (!env.DB) {
     throw new Error('Хранилище сайта пока недоступно.');
   }
 
-  return { db: env.DB, files: env.FILES };
+  return { db: env.DB };
 }
 
 export async function ensureSchema() {
@@ -80,11 +80,21 @@ export async function ensureSchema() {
           created_at TEXT NOT NULL,
           FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
         )`),
+        db.prepare(`CREATE TABLE IF NOT EXISTS media_chunks (
+          media_id TEXT NOT NULL,
+          chunk_index INTEGER NOT NULL,
+          data BLOB NOT NULL,
+          PRIMARY KEY (media_id, chunk_index),
+          FOREIGN KEY (media_id) REFERENCES media(id) ON DELETE CASCADE
+        )`),
         db.prepare(
           'CREATE INDEX IF NOT EXISTS events_position_idx ON events(y, x)',
         ),
         db.prepare(
           'CREATE INDEX IF NOT EXISTS media_event_id_idx ON media(event_id)',
+        ),
+        db.prepare(
+          'CREATE INDEX IF NOT EXISTS media_chunks_media_id_idx ON media_chunks(media_id, chunk_index)',
         ),
       ])
       .then(() => undefined)

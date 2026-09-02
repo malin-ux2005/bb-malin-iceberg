@@ -1,4 +1,4 @@
-import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { blob, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const events = sqliteTable('events', {
   id: text('id').primaryKey(),
@@ -23,3 +23,15 @@ export const media = sqliteTable('media', {
   r2Key: text('r2_key').notNull(),
   createdAt: text('created_at').notNull(),
 });
+
+export const mediaChunks = sqliteTable(
+  'media_chunks',
+  {
+    mediaId: text('media_id')
+      .notNull()
+      .references(() => media.id, { onDelete: 'cascade' }),
+    chunkIndex: integer('chunk_index').notNull(),
+    data: blob('data', { mode: 'buffer' }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.mediaId, table.chunkIndex] })],
+);

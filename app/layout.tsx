@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://bb-malin-iceberg.ddmalin.chatgpt.site'),
+  metadataBase: new URL('https://bb-malin-iceberg.bb-malin.workers.dev'),
   title: 'Пик / Айсберг — BB Malin',
   description:
     'Общий интерактивный айсберг истории BOLSHIE BROTHERS MALIN.',

@@ -8,6 +8,13 @@
       "when": 1788296285003,
       "tag": "0000_useful_iron_monger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788352462392,
+      "tag": "0001_sloppy_mercury",
+      "breakpoints": true
     }
   ]
 }

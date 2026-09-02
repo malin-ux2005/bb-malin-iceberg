@@ -54,14 +54,11 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
   try {
     const { id } = await params;
     await ensureSchema();
-    const { db, files } = getBindings();
-    const media = await db
-      .prepare('SELECT r2_key FROM media WHERE event_id = ?')
-      .bind(id)
-      .all<{ r2_key: string }>();
-
-    await Promise.all(media.results.map((item) => files.delete(item.r2_key)));
+    const { db } = getBindings();
     await db.batch([
+      db
+        .prepare('DELETE FROM media_chunks WHERE media_id IN (SELECT id FROM media WHERE event_id = ?)')
+        .bind(id),
       db.prepare('DELETE FROM media WHERE event_id = ?').bind(id),
       db.prepare('DELETE FROM events WHERE id = ?').bind(id),
     ]);
