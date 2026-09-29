@@ -82,6 +82,7 @@ type EditorState = {
 const STAGE_HEIGHT = 5200;
 const MIN_ZOOM = 0.75;
 const MAX_ZOOM = 1.5;
+const MAX_DEPTH_KM = 1488;
 
 const blankEditor = (x = 50, y = 18): EditorState => ({
   title: '',
@@ -448,8 +449,9 @@ export function IcebergExperience() {
   const pageStyle = {
     '--zoom': zoom,
     '--label-scale': Math.min(1.18, Math.max(0.86, zoom)),
-    minHeight: `${620 + STAGE_HEIGHT * zoom}px`,
+    minHeight: `${420 + STAGE_HEIGHT * zoom}px`,
   } as CSSProperties;
+  const depthKm = Math.round((scrollDepth / 100) * MAX_DEPTH_KM);
 
   return (
     <main className={`iceberg-page mode-${mode}`} style={pageStyle}>
@@ -540,11 +542,21 @@ export function IcebergExperience() {
       </section>
 
       <aside className="depth-meter" aria-hidden="true">
-        <span className="depth-meter-label">ГЛУБИНА</span>
-        <span className="depth-track">
-          <span style={{ height: `${scrollDepth}%` }} />
-        </span>
-        <output>{String(Math.round(scrollDepth)).padStart(2, '0')}%</output>
+        <div className="depth-readout">
+          <span className="depth-meter-label">ГЛУБИНА</span>
+          <output>{String(depthKm).padStart(4, '0')}</output>
+          <small>КМ</small>
+        </div>
+        <div className="depth-scale">
+          <span className="depth-track">
+            <span style={{ height: `${scrollDepth}%` }} />
+          </span>
+          <span className="depth-ticks">
+            <i>0000</i>
+            <i>0744</i>
+            <i>1488</i>
+          </span>
+        </div>
       </aside>
 
       <nav className="floating-controls" aria-label="Управление айсбергом">
