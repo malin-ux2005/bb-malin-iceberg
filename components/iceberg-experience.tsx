@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ArrowDown,
   CalendarDays,
   Check,
   Download,
@@ -10,6 +11,7 @@ import {
   Link as LinkIcon,
   LoaderCircle,
   Minus,
+  MousePointer2,
   Pencil,
   Plus,
   RotateCcw,
@@ -77,9 +79,9 @@ type EditorState = {
   files: File[];
 };
 
-const STAGE_HEIGHT = 4610;
-const MIN_ZOOM = 0.7;
-const MAX_ZOOM = 1.4;
+const STAGE_HEIGHT = 5200;
+const MIN_ZOOM = 0.75;
+const MAX_ZOOM = 1.5;
 
 const blankEditor = (x = 50, y = 18): EditorState => ({
   title: '',
@@ -287,6 +289,7 @@ export function IcebergExperience() {
   const [zoom, setZoom] = useState(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [scrollDepth, setScrollDepth] = useState(0);
   const [notice, setNotice] = useState('');
   const [draftPoint, setDraftPoint] = useState<{ x: number; y: number } | null>(null);
   const [newEvent, setNewEvent] = useState<EditorState>(blankEditor());
@@ -319,6 +322,21 @@ export function IcebergExperience() {
     const timeout = window.setTimeout(() => setNotice(''), 3600);
     return () => window.clearTimeout(timeout);
   }, [notice]);
+
+  useEffect(() => {
+    const updateDepth = () => {
+      const maximum = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      setScrollDepth(Math.min(100, Math.max(0, (window.scrollY / maximum) * 100)));
+    };
+
+    updateDepth();
+    window.addEventListener('scroll', updateDepth, { passive: true });
+    window.addEventListener('resize', updateDepth);
+    return () => {
+      window.removeEventListener('scroll', updateDepth);
+      window.removeEventListener('resize', updateDepth);
+    };
+  }, []);
 
   const uploadFiles = async (eventId: string, files: File[]) => {
     for (const file of files) {
@@ -424,37 +442,61 @@ export function IcebergExperience() {
   };
 
   const adjustZoom = (delta: number) => {
-    setZoom((value) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number((value + delta).toFixed(1)))));
+    setZoom((value) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number((value + delta).toFixed(2)))));
   };
 
   const pageStyle = {
     '--zoom': zoom,
-    minHeight: `${470 + STAGE_HEIGHT * zoom}px`,
+    '--label-scale': Math.min(1.18, Math.max(0.86, zoom)),
+    minHeight: `${620 + STAGE_HEIGHT * zoom}px`,
   } as CSSProperties;
 
   return (
     <main className={`iceberg-page mode-${mode}`} style={pageStyle}>
       <header className="peak-intro">
-        <p className="peak-kicker">ПИК / АЙСБЕРГ</p>
-        <h1>Видимое — только начало.</h1>
+        <div className="hero-meta" aria-hidden="true">
+          <span>BBM / ARCHIVE</span>
+          <span>ОБЩАЯ ХРОНОЛОГИЯ</span>
+        </div>
+        <p className="peak-kicker">BOLSHIE BROTHERS MALIN</p>
+        <h1>
+          <span>ПИК</span>
+          <i>/</i>
+          <span>АЙСБЕРГ</span>
+        </h1>
         <p className="peak-copy">
-          Ниже собирается общая история BOLSHIE BROTHERS MALIN. Приближай,
-          погружайся глубже и открывай события — от известного до того, что
-          помнят единицы.
+          Общая история, которую собирают все участники. Чем ниже ты
+          погружаешься, тем менее очевидными становятся события.
         </p>
-        <span className="dive-line" aria-hidden="true" />
+        <a className="dive-link" href="#iceberg-start">
+          <span>Начать погружение</span>
+          <ArrowDown />
+        </a>
       </header>
 
       <section
+        id="iceberg-start"
         className="iceberg-stage"
         aria-busy={loading}
         aria-label="Айсберг истории"
         onClick={handleCanvasClick}
       >
-        <div className="iceberg-photo" aria-hidden="true" />
-        <div className="surface-glow" aria-hidden="true" />
-        <div className="ice-atmosphere" aria-hidden="true" />
-        <div className="deep-haze" aria-hidden="true" />
+        <div className="world-art" aria-hidden="true">
+          <div className="art-iceberg" />
+          <div className="art-water" />
+          <div className="art-abyss" />
+          <div className="art-hell" />
+          <div className="art-inferno" />
+          <div className="art-grain" />
+        </div>
+        <div className="surface-rule" aria-hidden="true" />
+
+        {mode === 'edit' && (
+          <div className="edit-hint">
+            <MousePointer2 />
+            <span>Нажмите в любом месте, чтобы добавить событие</span>
+          </div>
+        )}
 
         {events.map((event) => (
           <button
@@ -497,61 +539,72 @@ export function IcebergExperience() {
         )}
       </section>
 
+      <aside className="depth-meter" aria-hidden="true">
+        <span className="depth-meter-label">ГЛУБИНА</span>
+        <span className="depth-track">
+          <span style={{ height: `${scrollDepth}%` }} />
+        </span>
+        <output>{String(Math.round(scrollDepth)).padStart(2, '0')}%</output>
+      </aside>
+
       <nav className="floating-controls" aria-label="Управление айсбергом">
-        <Button
-          className={`control ${mode === 'view' ? 'active' : ''}`}
-          onClick={() => setMode('view')}
-          size="icon-lg"
-          title="Просмотр"
-          aria-label="Режим просмотра"
-          variant="ghost"
-        >
-          <Eye />
-        </Button>
-        <Button
-          className={`control ${mode === 'edit' ? 'active' : ''}`}
-          onClick={() => setMode('edit')}
-          size="icon-lg"
-          title="Редактирование"
-          aria-label="Режим редактирования"
-          variant="ghost"
-        >
-          <Pencil />
-        </Button>
-        <span className="control-rule" />
-        <Button
-          className="control"
-          disabled={zoom <= MIN_ZOOM}
-          onClick={() => adjustZoom(-0.1)}
-          size="icon-lg"
-          title="Отдалить"
-          aria-label="Уменьшить масштаб"
-          variant="ghost"
-        >
-          <Minus />
-        </Button>
-        <span className="scale-value" aria-live="polite">{Math.round(zoom * 100)}%</span>
-        <Button
-          className="control"
-          disabled={zoom >= MAX_ZOOM}
-          onClick={() => adjustZoom(0.1)}
-          size="icon-lg"
-          title="Приблизить"
-          aria-label="Увеличить масштаб"
-          variant="ghost"
-        >
-          <Plus />
-        </Button>
-        <Button
-          className="control"
-          onClick={() => setZoom(1)}
-          size="icon-lg"
-          title="Сбросить масштаб"
-          aria-label="Сбросить масштаб"
-          variant="ghost"
-        >
-          <RotateCcw />
-        </Button>
+        <div className="mode-switch">
+          <Button
+            className={`control mode-control ${mode === 'view' ? 'active' : ''}`}
+            onClick={() => setMode('view')}
+            title="Просмотр"
+            aria-label="Режим просмотра"
+            variant="ghost"
+          >
+            <Eye />
+            <span>Смотреть</span>
+          </Button>
+          <Button
+            className={`control mode-control ${mode === 'edit' ? 'active' : ''}`}
+            onClick={() => setMode('edit')}
+            title="Редактирование"
+            aria-label="Режим редактирования"
+            variant="ghost"
+          >
+            <Pencil />
+            <span>Редактировать</span>
+          </Button>
+        </div>
+        <div className="zoom-switch">
+          <Button
+            className="control"
+            disabled={zoom <= MIN_ZOOM}
+            onClick={() => adjustZoom(-0.05)}
+            size="icon-lg"
+            title="Отдалить"
+            aria-label="Уменьшить масштаб"
+            variant="ghost"
+          >
+            <Minus />
+          </Button>
+          <span className="scale-value" aria-live="polite">{Math.round(zoom * 100)}%</span>
+          <Button
+            className="control"
+            disabled={zoom >= MAX_ZOOM}
+            onClick={() => adjustZoom(0.05)}
+            size="icon-lg"
+            title="Приблизить"
+            aria-label="Увеличить масштаб"
+            variant="ghost"
+          >
+            <Plus />
+          </Button>
+          <Button
+            className="control reset-control"
+            onClick={() => setZoom(1)}
+            size="icon-lg"
+            title="Сбросить масштаб"
+            aria-label="Сбросить масштаб"
+            variant="ghost"
+          >
+            <RotateCcw />
+          </Button>
+        </div>
       </nav>
 
       {notice && <div className="iceberg-notice" role="status">{notice}</div>}
