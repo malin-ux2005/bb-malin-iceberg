@@ -337,7 +337,7 @@ export function IcebergExperience() {
       window.removeEventListener('scroll', updateDepth);
       window.removeEventListener('resize', updateDepth);
     };
-  }, []);
+  }, [zoom]);
 
   const uploadFiles = async (eventId: string, files: File[]) => {
     for (const file of files) {
@@ -448,8 +448,7 @@ export function IcebergExperience() {
 
   const pageStyle = {
     '--zoom': zoom,
-    '--label-scale': Math.min(1.18, Math.max(0.86, zoom)),
-    minHeight: `${420 + STAGE_HEIGHT * zoom}px`,
+    '--label-scale': 1,
   } as CSSProperties;
   const depthKm = Math.round((scrollDepth / 100) * MAX_DEPTH_KM);
 
@@ -476,70 +475,78 @@ export function IcebergExperience() {
         </a>
       </header>
 
-      <section
-        id="iceberg-start"
-        className="iceberg-stage"
-        aria-busy={loading}
-        aria-label="Айсберг истории"
-        onClick={handleCanvasClick}
-      >
-        <div className="world-art" aria-hidden="true">
-          <div className="art-iceberg" />
-          <div className="art-water" />
-          <div className="art-abyss" />
-          <div className="art-hell" />
-          <div className="art-inferno" />
-          <div className="art-grain" />
-        </div>
-        <div className="surface-rule" aria-hidden="true" />
-
-        {mode === 'edit' && (
-          <div className="edit-hint">
-            <MousePointer2 />
-            <span>Нажмите в любом месте, чтобы добавить событие</span>
+      <div className="iceberg-viewport" style={{ height: STAGE_HEIGHT * zoom }}>
+        <section
+          id="iceberg-start"
+          className="iceberg-stage"
+          aria-busy={loading}
+          aria-label="Айсберг истории"
+          onClick={handleCanvasClick}
+        >
+          <div className="world-art" aria-hidden="true">
+            <img
+              className="art-iceberg"
+              src="/iceberg-full.png"
+              width={1254}
+              height={1254}
+              alt=""
+              fetchPriority="high"
+              draggable={false}
+            />
+            <div className="art-water" />
+            <div className="art-abyss" />
+            <div className="art-hell" />
+            <div className="art-inferno" />
           </div>
-        )}
 
-        {events.map((event) => (
-          <button
-            className="event-pin"
-            data-event-pin
-            key={event.id}
-            onClick={(click) => {
-              click.stopPropagation();
-              setSelectedId(event.id);
-            }}
-            style={{ left: `${event.x}%`, top: `${event.y}%` }}
-            type="button"
-          >
-            <span className="event-dot" />
-            <span className="event-label">{event.title}</span>
-          </button>
-        ))}
+          {mode === 'edit' && (
+            <div className="edit-hint">
+              <MousePointer2 />
+              <span>Нажмите в любом месте, чтобы добавить событие</span>
+            </div>
+          )}
 
-        {!events.length && mode === 'edit' && !loading && (
-          <button
-            className="empty-point"
-            aria-label="Добавить первое событие"
-            onClick={(click) => {
-              click.stopPropagation();
-              const point = { x: 50, y: 18 };
-              setDraftPoint(point);
-              setNewEvent(blankEditor(point.x, point.y));
-            }}
-            title="Добавить событие"
-            type="button"
-          >
-            <Plus />
-          </button>
-        )}
+          {events.map((event) => (
+            <button
+              className={`event-pin${event.x > 65 ? ' event-pin-right' : ''}`}
+              data-event-pin
+              key={event.id}
+              onClick={(click) => {
+                click.stopPropagation();
+                setSelectedId(event.id);
+              }}
+              style={{ left: `${event.x}%`, top: `${event.y}%` }}
+              type="button"
+            >
+              <span className="event-dot" />
+              <span className="event-label">{event.title}</span>
+            </button>
+          ))}
 
-        {loading && (
-          <div className="stage-loader" aria-label="Загрузка">
-            <LoaderCircle />
-          </div>
-        )}
-      </section>
+          {!events.length && mode === 'edit' && !loading && (
+            <button
+              className="empty-point"
+              aria-label="Добавить первое событие"
+              onClick={(click) => {
+                click.stopPropagation();
+                const point = { x: 50, y: 18 };
+                setDraftPoint(point);
+                setNewEvent(blankEditor(point.x, point.y));
+              }}
+              title="Добавить событие"
+              type="button"
+            >
+              <Plus />
+            </button>
+          )}
+
+          {loading && (
+            <div className="stage-loader" aria-label="Загрузка">
+              <LoaderCircle />
+            </div>
+          )}
+        </section>
+      </div>
 
       <aside className="depth-meter" aria-hidden="true">
         <div className="depth-readout">

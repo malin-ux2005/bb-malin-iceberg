@@ -105,20 +105,10 @@
 
 .iceberg-page {
   position: relative;
-  min-height: 5800px;
   overflow: clip;
   isolation: isolate;
-  background: #05080a;
+  background: #000103;
   color: #f1f4f3;
-}
-
-.iceberg-page::before {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  border: 1px solid rgb(228 244 247 / 8%);
-  content: '';
-  pointer-events: none;
 }
 
 .peak-intro {
@@ -131,17 +121,6 @@
   justify-content: center;
   padding: 84px clamp(24px, 7vw, 118px) 92px;
   color: #eff3f2;
-}
-
-.peak-intro::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(90deg, #05080a 0 42%, rgb(5 8 10 / 88%) 58%, rgb(5 8 10 / 18%) 82%, transparent),
-    linear-gradient(180deg, #05080a 0 6%, transparent 38% 100%);
-  content: '';
-  pointer-events: none;
 }
 
 .hero-meta {
@@ -230,9 +209,14 @@
   height: 15px;
 }
 
+.iceberg-viewport {
+  position: relative;
+  height: calc(5200px * var(--zoom, 1));
+}
+
 .iceberg-stage {
   position: absolute;
-  top: 340px;
+  top: 0;
   right: 0;
   left: 0;
   z-index: 1;
@@ -246,7 +230,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #03080b;
+  background: #000103;
   pointer-events: none;
 }
 
@@ -254,7 +238,6 @@
 .art-water,
 .art-abyss,
 .art-hell,
-.art-grain,
 .art-inferno {
   position: absolute;
   right: 0;
@@ -263,56 +246,19 @@
 }
 
 .art-iceberg {
+  display: block;
   top: 0;
-  height: 1120px;
-  background-image: url('/og.jpg');
-  background-position: right top;
-  background-repeat: no-repeat;
-  background-size: 1280px auto;
-  filter: saturate(0.84) contrast(1.12) brightness(0.98);
-  -webkit-mask-image: linear-gradient(180deg, #000 0 76%, transparent 99%);
-  mask-image: linear-gradient(180deg, #000 0 76%, transparent 99%);
-}
-
-.art-iceberg::before {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, #05080a 0 39%, rgb(5 8 10 / 91%) 45%, transparent 56%),
-    linear-gradient(180deg, #05080a 0 2%, transparent 12% 73%, #001018 99%);
-  content: '';
-}
-
-.art-iceberg::after {
-  position: absolute;
-  top: 320px;
-  bottom: 0;
-  left: 0;
-  width: 66%;
-  background:
-    radial-gradient(ellipse at 78% 22%, rgb(0 62 82 / 18%), transparent 52%),
-    linear-gradient(90deg, #00131d 0 90%, transparent 100%);
-  content: '';
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  max-width: none;
 }
 
 .art-water {
-  top: 320px;
-  height: 3150px;
-  background:
-    radial-gradient(ellipse at 67% 4%, rgb(195 248 255 / 19%), transparent 18%),
-    radial-gradient(ellipse at 51% 25%, rgb(0 144 176 / 16%), transparent 35%),
-    radial-gradient(ellipse at 14% 55%, rgb(0 79 112 / 20%), transparent 34%),
-    linear-gradient(180deg, rgb(0 80 107 / 16%) 0, #00131d 33%, #00080e 77%, #020608 100%);
-}
-
-.art-water::before {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(100deg, transparent 0 21%, rgb(134 227 244 / 4%) 21.2%, transparent 21.7% 72%, rgb(134 227 244 / 3%) 72.2%, transparent 72.8%),
-    radial-gradient(ellipse at 50% 8%, transparent 0 18%, rgb(161 237 247 / 5%) 18.5%, transparent 20%);
-  content: '';
-  opacity: 0.75;
+  top: 0;
+  z-index: 1;
+  height: 3520px;
+  background: linear-gradient(180deg, #000103 0 30%, #00060a 66%, #020406 100%);
 }
 
 .art-abyss {
@@ -391,26 +337,6 @@
   content: '';
 }
 
-.art-grain {
-  inset: 0;
-  z-index: 5;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-  mix-blend-mode: soft-light;
-  opacity: 0.12;
-}
-
-.surface-rule {
-  position: absolute;
-  top: 320px;
-  right: -8vw;
-  left: -8vw;
-  z-index: 6;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(220 250 255 / 78%) 18% 82%, transparent);
-  box-shadow: 0 0 15px rgb(125 230 247 / 30%), 0 18px 46px rgb(0 145 178 / 15%);
-}
-
 .edit-hint {
   position: sticky;
   top: 22px;
@@ -444,18 +370,6 @@
   cursor: crosshair;
 }
 
-.mode-edit .world-art::after {
-  position: absolute;
-  inset: 0;
-  z-index: 8;
-  background-image:
-    linear-gradient(rgb(228 245 248 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(228 245 248 / 4%) 1px, transparent 1px);
-  background-size: 100% 260px, 12.5% 100%;
-  content: '';
-  opacity: 0.7;
-}
-
 .event-pin {
   position: absolute;
   z-index: 12;
@@ -481,6 +395,12 @@
   background: #071014;
   box-shadow: 0 0 0 5px rgb(203 242 249 / 7%), 0 0 18px rgb(152 237 249 / 30%);
   transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.event-pin-right {
+  flex-direction: row-reverse;
+  transform: translate(calc(-100% + 8px), -50%);
+  text-align: right;
 }
 
 .event-label {
@@ -1062,12 +982,6 @@
     padding: 100px 22px 72px;
   }
 
-  .peak-intro::before {
-    background:
-      linear-gradient(180deg, #05080a 0 11%, rgb(5 8 10 / 18%) 44%, transparent 78%),
-      linear-gradient(90deg, #05080a 0 15%, transparent 100%);
-  }
-
   .hero-meta {
     top: 24px;
     right: 22px;
@@ -1102,39 +1016,9 @@
     margin-top: 34px;
   }
 
-  .iceberg-stage {
-    top: 470px;
-  }
-
-  .art-iceberg {
-    top: 0;
-    height: 860px;
-    background-position: right top;
-    background-size: 780px auto;
-  }
-
-  .art-iceberg::before {
-    background:
-      linear-gradient(90deg, #05080a 0 39%, rgb(5 8 10 / 91%) 45%, transparent 56%),
-      linear-gradient(180deg, #05080a 0 4%, transparent 18% 63%, #001018 95%);
-  }
-
-  .art-iceberg::after {
-    top: 195px;
-    width: 50%;
-  }
-
-  .art-water {
-    top: 195px;
-  }
-
   .art-inferno {
     background-position: center, center, 60% bottom;
     background-size: 100% 100%, 100% 100%, cover;
-  }
-
-  .surface-rule {
-    top: 195px;
   }
 
   .depth-meter {
@@ -1207,16 +1091,6 @@
 }
 
 @media (max-width: 540px) {
-  .art-iceberg::after {
-    display: none;
-  }
-
-  .art-iceberg::before {
-    background:
-      linear-gradient(90deg, rgb(5 8 10 / 92%) 0 2%, rgb(5 8 10 / 52%) 9%, transparent 20%),
-      linear-gradient(180deg, #05080a 0 4%, transparent 18% 63%, #001018 95%);
-  }
-
   .peak-intro h1 {
     font-size: clamp(3.2rem, 16vw, 4.3rem);
   }
