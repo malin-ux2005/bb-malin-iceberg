@@ -258,7 +258,7 @@
   top: 0;
   z-index: 1;
   height: 3520px;
-  background: linear-gradient(180deg, #000103 0 30%, #00060a 66%, #020406 100%);
+  background: linear-gradient(180deg, #000103 0 100vw, #020406 100%);
 }
 
 .art-abyss {
